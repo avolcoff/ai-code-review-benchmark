@@ -6,8 +6,13 @@ yarn-error.log*
 
 # Results and reports
 results/
-*.json
-*.md
+
+# Keep important files
+!package.json
+!package-lock.json
+!config/*.json
+!README.md
+!docs/*.md
 
 # Environment variables
 .env
