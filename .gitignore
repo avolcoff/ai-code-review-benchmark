@@ -9,6 +9,11 @@ results/
 *.json
 *.md
 
+# Keep important JSON files
+!package.json
+!package-lock.json
+!config/*.json
+
 # Environment variables
 .env
 .env.local
