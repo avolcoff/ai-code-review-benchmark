@@ -1,0 +1,162 @@
+{
+    "benchmark": {
+        "name": "Real Production Code Benchmark",
+        "description": "Benchmarking CodeRabbit and Greptile against real production code repositories",
+        "version": "2.0.0"
+    },
+    "real_code_repositories": {
+        "javascript": [
+            {
+                "name": "express",
+                "url": "https://github.com/expressjs/express",
+                "description": "Fast, unopinionated, minimalist web framework for Node.js",
+                "complexity": "high",
+                "focus_areas": ["security", "performance", "best_practices"]
+            },
+            {
+                "name": "lodash",
+                "url": "https://github.com/lodash/lodash",
+                "description": "A modern JavaScript utility library delivering modularity, performance & extras",
+                "complexity": "medium",
+                "focus_areas": ["performance", "best_practices", "code_quality"]
+            }
+        ],
+        "typescript": [
+            {
+                "name": "typescript",
+                "url": "https://github.com/microsoft/TypeScript",
+                "description": "TypeScript is a superset of JavaScript that compiles to clean JavaScript output",
+                "complexity": "very_high",
+                "focus_areas": ["security", "performance", "best_practices", "code_quality"]
+            },
+            {
+                "name": "angular",
+                "url": "https://github.com/angular/angular",
+                "description": "Deliver web apps with confidence",
+                "complexity": "very_high",
+                "focus_areas": ["security", "performance", "best_practices", "architecture"]
+            }
+        ],
+        "python": [
+            {
+                "name": "django",
+                "url": "https://github.com/django/django",
+                "description": "The Web framework for perfectionists with deadlines",
+                "complexity": "high",
+                "focus_areas": ["security", "performance", "best_practices", "web_security"]
+            },
+            {
+                "name": "requests",
+                "url": "https://github.com/psf/requests",
+                "description": "A simple, yet elegant HTTP library",
+                "complexity": "medium",
+                "focus_areas": ["security", "best_practices", "api_security"]
+            }
+        ],
+        "java": [
+            {
+                "name": "spring-boot",
+                "url": "https://github.com/spring-projects/spring-boot",
+                "description": "Spring Boot makes it easy to create stand-alone, production-grade Spring based Applications",
+                "complexity": "very_high",
+                "focus_areas": ["security", "performance", "best_practices", "enterprise"]
+            }
+        ],
+        "go": [
+            {
+                "name": "kubernetes",
+                "url": "https://github.com/kubernetes/kubernetes",
+                "description": "Production-Grade Container Scheduling and Management",
+                "complexity": "very_high",
+                "focus_areas": ["security", "performance", "best_practices", "cloud_native"]
+            }
+        ]
+    },
+    "benchmark_criteria": {
+        "code_quality": {
+            "weight": 0.35,
+            "metrics": [
+                "bug_detection_accuracy",
+                "security_vulnerability_detection",
+                "code_smell_identification",
+                "best_practice_suggestions",
+                "false_positive_rate"
+            ]
+        },
+        "performance": {
+            "weight": 0.25,
+            "metrics": [
+                "response_time",
+                "processing_speed",
+                "memory_usage",
+                "concurrent_analysis_capability"
+            ]
+        },
+        "usability": {
+            "weight": 0.20,
+            "metrics": [
+                "ease_of_integration",
+                "documentation_quality",
+                "user_interface_quality",
+                "learning_curve"
+            ]
+        },
+        "features": {
+            "weight": 0.20,
+            "metrics": [
+                "language_support",
+                "framework_support",
+                "integration_options",
+                "customization_capabilities"
+            ]
+        }
+    },
+    "analysis_settings": {
+        "file_size_limits": {
+            "max_lines": 1000,
+            "max_bytes": 50000
+        },
+        "sampling_strategy": {
+            "method": "stratified_random",
+            "files_per_repo": 50,
+            "focus_on": ["src", "lib", "app", "core"]
+        },
+        "excluded_patterns": [
+            "node_modules",
+            "vendor",
+            "dist",
+            "build",
+            "*.min.js",
+            "*.min.css",
+            "*.map"
+        ]
+    },
+    "tools": {
+        "coderabbit": {
+            "name": "CodeRabbit",
+            "integration_method": "github_app",
+            "features": {
+                "supported_languages": ["javascript", "typescript", "python", "java", "go", "php", "ruby", "csharp"],
+                "analysis_depth": "comprehensive",
+                "review_style": "pull_request_comments",
+                "setup_required": ["github_app_installation", "repository_access"]
+            }
+        },
+        "greptile": {
+            "name": "Greptile",
+            "integration_method": "github_app",
+            "features": {
+                "supported_languages": ["javascript", "typescript", "python", "java", "go", "php", "ruby", "csharp", "rust", "kotlin"],
+                "analysis_depth": "comprehensive",
+                "review_style": "pull_request_comments",
+                "setup_required": ["github_app_installation", "repository_access"]
+            }
+        }
+    },
+    "reporting": {
+        "output_formats": ["json", "markdown", "html"],
+        "metrics_dashboard": true,
+        "comparative_analysis": true,
+        "detailed_logs": true
+    }
+} 
