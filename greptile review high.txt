@@ -1,0 +1,244 @@
+Skip to content
+Navigation Menu
+avolcoff
+ai-code-review-benchmark
+
+Type / to search
+Code
+Issues
+Pull requests
+2
+Actions
+Projects
+Wiki
+Security
+1
+Insights
+Settings
+Greptile pr #12
+ Open
+avolcoff wants to merge 2 commits into main from greptile-pr  
++2,213 −0 
+ Conversation 42
+ Commits 2
+ Checks 0
+ Files changed 11
+Conversation
+avolcoff
+Owner
+avolcoff commented 40 minutes ago
+No description provided.
+
+arivbalcony added 2 commits yesterday
+@arivbalcony
+Add all vulnerability files without CRITICAL comments
+55a4fe6
+@arivbalcony
+updated
+c757cab
+greptile-apps[bot]
+greptile-apps bot reviewed 39 minutes ago
+greptile-apps bot left a comment
+Greptile Summary
+This PR establishes a comprehensive multi-platform user management system benchmark repository designed to test AI code review capabilities. The changes introduce a complete project structure spanning Node.js backend services, Angular frontend components, mobile applications (iOS Swift and Android Kotlin), and Python utilities.
+
+The core architecture includes:
+
+Backend Infrastructure: Express.js application with user authentication services, JWT-based security, and MongoDB integration
+Frontend Components: Angular TypeScript components for user management interfaces
+Mobile Applications: Native iOS (Swift) and Android (Kotlin) user management implementations
+Utilities: Python data processing modules and Node.js cache management services
+Project Setup: Comprehensive documentation, environment configuration templates, and Git ignore rules
+The codebase appears intentionally designed as a security benchmark suite, containing systematic implementations of common vulnerability patterns across different technology stacks. This includes SQL injection, XSS, authentication bypasses, hardcoded secrets, weak cryptography, and command injection vulnerabilities. The naming conventions (VulnerableUserService, SecurityIssuesActivity) and the repository name ai-code-review-benchmark confirm this is meant to evaluate automated code review systems' ability to detect security flaws rather than serve as production code.
+
+The integration follows a typical microservices pattern where the Express.js backend provides REST APIs consumed by frontend and mobile clients, with shared authentication mechanisms and user data models across platforms.
+
+Important Files Changed
+File Changes Summary
+Confidence score: 0/5
+This PR is absolutely not safe to merge due to critical security vulnerabilities and runtime failures that would compromise any production system
+Score reflects intentionally vulnerable code designed for security testing combined with structural issues that prevent basic functionality
+Pay immediate attention to all backend service files, mobile components, and frontend code which contain systematic security flaws that could expose sensitive data and system access
+11 files reviewed, 41 comments
+
+Edit Code Review Bot Settings | Greptile
+
+src/utils/cache-manager.js
+        const results = [];
+
+        for (let file of files) {
+            const content = fs.readFileSync(file, 'utf8');
+@greptile-apps greptile-apps bot 40 minutes ago
+logic: Synchronous file I/O blocks the event loop in an async method - use fs.promises.readFile instead
+
+Suggested change
+            const content = fs.readFileSync(file, 'utf8');
+            const content = await fs.promises.readFile(file, 'utf8');
+@avolcoff	Reply...
+src/utils/cache-manager.js
+Comment on lines +152 to +160
+    async executeQuery(query, params) {
+        const connection = await this.createDatabaseConnection();
+        return new Promise((resolve, reject) => {
+            connection.query(query, params, (error, results) => {
+                if (error) reject(error);
+                else resolve(results);
+            });
+        });
+    }
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: Database connection created but never closed, leading to connection pool exhaustion
+
+@avolcoff	Reply...
+.gitignore
+Comment on lines +109 to +110
+*.json
+!config/*.json
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: Excluding all .json files but allowing config/.json could inadvertently exclude important JSON files like package.json, tsconfig.json, or other configuration files in root directories
+
+@avolcoff	Reply...
+src/frontend/angular/user-component.ts
+Comment on lines +39 to +44
+  loadUserContent(userInput: string) {
+    this.userContent = this.sanitizer.bypassSecurityTrustHtml(`
+      <h1>Welcome ${userInput}</h1>
+      <script>alert('XSS Attack!')</script>
+    `);
+  }
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: Bypassing Angular's XSS protection with bypassSecurityTrustHtml() and embedding unsanitized user input creates XSS vulnerabilities.
+
+Suggested change
+  loadUserContent(userInput: string) {
+    this.userContent = this.sanitizer.bypassSecurityTrustHtml(`
+      <h1>Welcome ${userInput}</h1>
+      <script>alert('XSS Attack!')</script>
+    `);
+  }
+  loadUserContent(userInput: string) {
+    this.userContent = this.sanitizer.sanitize(SecurityContext.HTML, `
+      <h1>Welcome ${userInput}</h1>
+    `);
+  }
+@avolcoff	Reply...
+src/frontend/angular/user-component.ts
+  }
+
+  async searchUsers() {
+    const query = `SELECT * FROM users WHERE name LIKE '%${this.searchTerm}%'`;
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: Direct string interpolation in SQL query creates SQL injection vulnerability. Use parameterized queries.
+
+@avolcoff	Reply...
+31 hidden conversations
+Load more…
+src/mobile/ios/user-manager.swift
+    }
+
+    func searchUsers(query: String) -> [User] {
+        let sqlQuery = "SELECT * FROM users WHERE name LIKE '%\(query)%'"
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: SQL injection in search function - query parameter should be parameterized
+
+@avolcoff	Reply...
+src/backend/services/user-service.js
+            }
+
+            // Check if user is requesting their own data or is admin
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: isAdmin returns a Promise but is called synchronously here, causing authorization to always fail since !Promise is always false
+
+Suggested change
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+            if (userId !== requestingUserId && !(await this.isAdmin(requestingUserId))) {
+@avolcoff	Reply...
+src/backend/services/user-service.js
+            }
+
+            // Check if user already exists
+            const existingUser = await UserModel.findOne({ email: userData.email });
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: Email should be normalized to lowercase here for consistency with authentication logic on line 78
+
+@avolcoff	Reply...
+src/backend/services/user-service.js
+            }
+
+            // Check authorization
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: Same async/sync issue with isAdmin method - should be await this.isAdmin(requestingUserId)
+
+Suggested change
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+            if (userId !== requestingUserId && !(await this.isAdmin(requestingUserId))) {
+@avolcoff	Reply...
+src/backend/services/user-service.js
+            }
+
+            // Only allow users to delete their own account or admin to delete any
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+@greptile-apps greptile-apps bot 39 minutes ago
+logic: Same async/sync issue with isAdmin method - authorization bypass vulnerability
+
+Suggested change
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+            if (userId !== requestingUserId && !(await this.isAdmin(requestingUserId))) {
+@avolcoff	Reply...
+Merge info
+All checks have passed
+1 successful check
+
+
+No conflicts with base branch
+Merging can be performed automatically.
+
+You can also merge this with the command line. 
+@avolcoff
+
+
+Add a comment
+Comment
+ 
+Add your comment here...
+ 
+Remember, contributions to this repository should follow our GitHub Community Guidelines.
+ ProTip! Add .patch or .diff to the end of URLs for Git’s plaintext views.
+Reviewers
+@greptile-apps
+greptile-apps[bot]
+Still in progress?
+Assignees
+No one—
+Labels
+None yet
+Projects
+None yet
+Milestone
+No milestone
+Development
+Successfully merging this pull request may close these issues.
+
+None yet
+
+
+Notifications
+Customize
+You’re receiving notifications because you authored the thread.
+2 participants
+@avolcoff
+@arivbalcony
+Footer
+© 2025 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+Greptile pr by avolcoff · Pull Request #12 · avolcoff/ai-code-review-benchmark
