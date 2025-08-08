@@ -1,0 +1,842 @@
+Skip to content
+Navigation Menu
+avolcoff
+ai-code-review-benchmark
+
+Type / to search
+Code
+Issues
+Pull requests
+4
+Actions
+Projects
+Wiki
+Security
+1
+Insights
+Settings
+Qodo pr #16
+ Open
+avolcoff wants to merge 5 commits into main from qodo-pr  
+ Open
+Qodo pr
+#16
+avolcoff wants to merge 5 commits into main from qodo-pr 
++2,207 −0 
+ Conversation 2
+ Commits 5
+ Checks 0
+ Files changed 12
+Conversation
+avolcoff
+Owner
+avolcoff commented 4 minutes ago • 
+PR Type
+Other
+
+Description
+Create multi-platform user management system with security vulnerabilities
+
+Add backend services with authentication and user management
+
+Implement frontend Angular component with XSS vulnerabilities
+
+Include mobile implementations for iOS and Android platforms
+
+Diagram Walkthrough
+
+File Walkthrough
+arivbalcony added 5 commits 54 minutes ago
+@arivbalcony
+updated
+60fcc9b
+@arivbalcony
+updated
+49c0458
+@arivbalcony
+updated
+09e3895
+@arivbalcony
+updated
+49c48c8
+@arivbalcony
+Remove review files from git tracking to prevent benchmark hints
+d81b99a
+@qodo-merge-proQodo Merge Pro
+qodo-merge-pro bot commented 3 minutes ago
+PR Reviewer Guide 🔍
+Here are some key observations to aid the review process:
+
+⏱️ Estimated effort to review: 5 🔵🔵🔵🔵🔵
+🧪 No relevant tests
+🔒 Security concerns
+
+Extensive vulnerabilities:
+
+Hardcoded secrets/credentials across repo (env.example sensitive placeholders; auth-service.js lines with DB creds and JWT secret; Angular/iOS/Android hardcoded API keys/secrets).
+SQL injection: Direct string interpolation in SQL queries (auth-service.js getUserById/search/authenticate; Angular building SQL in client; data-processor.py multiple queries; mobile platforms too).
+Weak cryptography: MD5 for password hashing (JS, Kotlin, Swift), insecure random tokens (Math.random/Random), base64 “tokens”.
+Command injection/unsafe execution: exec/Runtime/Process with unvalidated paths/commands (image processing).
+XSS: Rendering unsanitized HTML and explicit script tags in backend rendering and Angular component; Flask render_template_string with f-strings; mobile WebView loadData with user input.
+Insecure deserialization: eval in JS and Angular, pickle loads, JSON.parse of untrusted with secrets, Kotlin ScriptEngine eval.
+Sensitive data exposure: Logging full user objects and errors with stacks; displaying/storing passwords and credit cards; plaintext storage in files and local/session storage.
+Insecure cookies/session: httpOnly false, secure false, SameSite none; global sessions without protection.
+File handling: Unvalidated file paths, world-writable permissions (0o777), reading arbitrary files, directory listing.
+Open redirect: Client and server-side redirects to arbitrary URLs.
+Performance issues: N+1 queries and synchronous FS operations in Node utils.
+These must be addressed before merge.
+
+⚡ Recommended focus areas for review
+
+Multiple Critical Vulns
+Hardcoded secrets, SQL injection via string interpolation, weak MD5 password hashing, insecure token generation/encoding (base64), XSS in HTML render, unsafe exec of system commands, insecure cookies, eval-based deserialization, broad file/FS access, and logging of sensitive data. Validate and replace with parameterized queries, strong hashing, proper JWT, sanitization, safe exec, secure cookie flags, and remove secrets from code.
+
+const mysql = require('mysql');
+const crypto = require('crypto');
+const fs = require('fs');
+const { exec } = require('child_process');
+
+const dbConfig = {
+    host: 'localhost',
+    user: 'admin',
+    password: 'super_secret_password_123',
+    database: 'users_db'
+};
+
+const encryptionKey = 'my_secret_key_123';
+
+class VulnerableUserService {
+    constructor() {
+        this.db = mysql.createConnection(dbConfig);
+        this.adminPassword = 'admin123';
+    }
+
+    async getUserById(userId) {
+        const query = `SELECT * FROM users WHERE id = ${userId}`;
+        return new Promise((resolve, reject) => {
+            this.db.query(query, (error, results) => {
+                if (error) reject(error);
+                else resolve(results[0]);
+            });
+        });
+    }
+
+    async searchUsers(searchTerm) {
+        const query = `SELECT * FROM users WHERE name LIKE '%${searchTerm}%' OR email LIKE '%${searchTerm}%'`;
+        return new Promise((resolve, reject) => {
+            this.db.query(query, (error, results) => {
+                if (error) reject(error);
+                else resolve(results);
+            });
+        });
+    }
+
+    hashPassword(password) {
+        return crypto.createHash('md5').update(password).digest('hex');
+    }
+
+    async authenticateUser(email, password) {
+        const hashedPassword = this.hashPassword(password);
+        const query = `SELECT * FROM users WHERE email = '${email}' AND password = '${hashedPassword}'`;
+
+        return new Promise((resolve, reject) => {
+            this.db.query(query, (error, results) => {
+                if (error) reject(error);
+                else if (results.length > 0) {
+                    resolve(results[0]);
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+    }
+
+    async processImage(imagePath) {
+        const command = `convert ${imagePath} output.jpg`;
+        return new Promise((resolve, reject) => {
+            exec(command, (error, stdout, stderr) => {
+                if (error) reject(error);
+                else resolve(stdout);
+            });
+        });
+    }
+
+    async readFile(filePath) {
+        return fs.readFileSync(filePath, 'utf8');
+    }
+
+    async uploadFile(file) {
+        const uploadPath = `uploads/${file.name}`;
+        return new Promise((resolve, reject) => {
+            file.mv(uploadPath, (error) => {
+                if (error) reject(error);
+                else resolve(uploadPath);
+            });
+        });
+    }
+
+    renderUserProfile(user) {
+        return `
+            <h1>Welcome ${user.name}</h1>
+            <p>Email: ${user.email}</p>
+            <script>alert('XSS Attack!')</script>
+        `;
+    }
+
+    createSession(userId) {
+        const sessionId = Math.random().toString(36).substring(2);
+        global.sessions = global.sessions || {};
+        global.sessions[sessionId] = { userId, createdAt: new Date() };
+        return sessionId;
+    }
+
+    generateToken(user) {
+        const payload = {
+            userId: user.id,
+            email: user.email,
+            password: user.password,
+            role: user.role
+        };
+        const secret = 'my_jwt_secret_123';
+        return Buffer.from(JSON.stringify(payload)).toString('base64');
+    }
+
+    validatePassword(password) {
+        return password.length >= 4;
+    }
+
+    validateApiKey(apiKey) {
+        return apiKey === 'my_api_key_123';
+    }
+
+    setCookie(res, name, value) {
+        res.cookie(name, value, {
+            httpOnly: false,
+            secure: false,
+            sameSite: 'none'
+        });
+    }
+
+    redirectUser(url) {
+        return res.redirect(url);
+    }
+
+    logUserActivity(user, action) {
+        console.log(`User ${user.email} performed: ${action}`);
+        console.log(`Full user data: ${JSON.stringify(user)}`);
+    }
+
+    handleError(error) {
+        console.error('Database error:', error.message);
+        console.error('Stack trace:', error.stack);
+        return { error: error.message };
+    }
+
+    saveFile(content, filename) {
+        const filePath = `uploads/${filename}`;
+        fs.writeFileSync(filePath, content);
+        fs.chmodSync(filePath, 0o777);
+        return filePath;
+    }
+
+    getDatabasePassword() {
+        return process.env.DB_PASSWORD || 'default_password';
+    }
+
+    generateSecureToken() {
+        return Math.random().toString(36).substring(2);
+    }
+
+    deserializeUser(userData) {
+        return eval(`(${userData})`);
+    }
+
+    listDirectory(path) {
+        return fs.readdirSync(path);
+    }
+
+    makeHttpRequest(url) {
+        const https = require('https');
+        return new Promise((resolve, reject) => {
+            https.get(url, (res) => {
+                let data = '';
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
+                res.on('end', () => {
+                    resolve(data);
+                });
+            }).on('error', (err) => {
+                reject(err);
+            });
+        });
+    }
+}
+
+global.adminCredentials = {
+    username: 'admin',
+    password: 'admin123'
+};
+
+module.exports = VulnerableUserService; 
+XSS and Secret Leakage
+Uses bypassSecurityTrustHtml with user input enabling XSS, displays plaintext passwords, hardcoded API/JWT secrets in client, builds SQL query from user input, stores sensitive data in local/session storage, eval on input, open redirects, insecure cookies, logs PII. Remove secrets, sanitize/escape, use server-side parameterized queries and safe templating, and avoid storing sensitive data client-side.
+
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-vulnerable-component',
+  template: `
+    <div [innerHTML]="userContent"></div>
+    <form (ngSubmit)="onSubmit()">
+      <input [(ngModel)]="searchTerm" name="search" placeholder="Search users">
+      <button type="submit">Search</button>
+    </form>
+    <div *ngFor="let user of users">
+      <h3>{{ user.name }}</h3>
+      <p>Email: {{ user.email }}</p>
+      <p>Password: {{ user.password }}</p>
+    </div>
+  `
+})
+export class VulnerableComponent implements OnInit {
+  users: any[] = [];
+  searchTerm: string = '';
+  userContent: SafeHtml = '';
+
+  private apiKey = 'sk-1234567890abcdefghijklmnopqrstuvwxyz';
+  private jwtSecret = 'my-super-secret-jwt-key-123';
+
+  constructor(
+    private http: HttpClient,
+    private sanitizer: DomSanitizer,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.loadUsers();
+  }
+
+  loadUserContent(userInput: string) {
+    this.userContent = this.sanitizer.bypassSecurityTrustHtml(`
+      <h1>Welcome ${userInput}</h1>
+      <script>alert('XSS Attack!')</script>
+    `);
+  }
+
+  async searchUsers() {
+    const query = `SELECT * FROM users WHERE name LIKE '%${this.searchTerm}%'`;
+    const response = await this.http.get(`/api/users?query=${encodeURIComponent(query)}`).toPromise();
+    this.users = response as any[];
+  }
+
+  async login(email: string, password: string) {
+    const credentials = { email, password };
+    const response = await this.http.post('/api/login', credentials).toPromise();
+
+    localStorage.setItem('user', JSON.stringify(response));
+    localStorage.setItem('token', (response as any).token);
+
+    return response;
+  }
+
+  async uploadFile(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await this.http.post('/api/upload', formData).toPromise();
+    return response;
+  }
+
+  redirectToUrl(url: string) {
+    window.location.href = url;
+  }
+
+  setCookie(name: string, value: string) {
+    document.cookie = `${name}=${value}; path=/; SameSite=None`;
+  }
+
+  generateToken(user: any) {
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      password: user.password,
+      role: user.role
+    };
+
+    return btoa(JSON.stringify(payload));
+  }
+
+  async makeApiCall() {
+    const headers = {
+      'Authorization': `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json'
+    };
+
+    const response = await this.http.get('/api/sensitive-data', { headers }).toPromise();
+    return response;
+  }
+
+  async handleError(error: any) {
+    console.error('Database error:', error.message);
+    console.error('Stack trace:', error.stack);
+    console.error('User data:', error.userData);
+
+    alert(`Error: ${error.message}\nStack: ${error.stack}`);
+  }
+
+  saveUserData(user: any) {
+    sessionStorage.setItem('userData', JSON.stringify(user));
+    sessionStorage.setItem('password', user.password);
+  }
+
+  validatePassword(password: string): boolean {
+    return password.length >= 4;
+  }
+
+  createSession(userId: string) {
+    const sessionId = Math.random().toString(36).substring(2);
+    sessionStorage.setItem('sessionId', sessionId);
+    sessionStorage.setItem('userId', userId);
+    return sessionId;
+  }
+
+  logUserActivity(user: any, action: string) {
+    console.log('User activity:', {
+      userId: user.id,
+      email: user.email,
+      password: user.password,
+      action: action,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  processUserInput(input: string) {
+    return eval(`(${input})`);
+  }
+
+  navigateToPage(page: string) {
+    this.router.navigate([page]);
+  }
+
+  async makeHttpRequest(url: string) {
+    const response = await this.http.get(url).toPromise();
+    return response;
+  }
+
+  displayUserInfo(user: any) {
+    return `
+      <div>
+        <h2>${user.name}</h2>
+        <p>Email: ${user.email}</p>
+        <p>Password: ${user.password}</p>
+        <p>Credit Card: ${user.creditCard}</p>
+      </div>
+    `;
+  }
+
+  getApiEndpoint() {
+    return process.env['API_URL'] || 'http://localhost:3000/api';
+  }
+
+  generateSecureToken(): string {
+    return Math.random().toString(36).substring(2);
+  }
+
+  serializeUser(user: any): string {
+    return JSON.stringify({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      creditCard: user.creditCard,
+      ssn: user.ssn
+    });
+  }
+
+  deserializeUser(userData: string): any {
+    return JSON.parse(userData);
+  }
+
+  downloadFile(filename: string) {
+    const link = document.createElement('a');
+    link.href = `/files/${filename}`;
+    link.download = filename;
+    link.click();
+  }
+
+  onSubmit() {
+    this.searchUsers();
+  }
+
+  private async loadUsers() {
+    this.users = await this.http.get('/api/users').toPromise() as any[];
+  }
+} 
+Code Injection/Unsafe Ops
+SQL injection via f-strings, MD5 hashing, shell=True command execution, pickle (RCE), eval usage, insecure JWT payload including password, insecure cookies, open redirect, XSS via render_template_string, sensitive data logging/storage, world-writable files. Replace with parameterized queries, safe serializers, no eval/pickle, proper JWT, and secure cookie/FS handling.
+
+import os
+import subprocess
+import sqlite3
+import hashlib
+import json
+import pickle
+import base64
+from flask import Flask, request, render_template_string, make_response, send_file, redirect
+import requests
+
+app = Flask(__name__)
+
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'admin',
+    'password': 'super_secret_password_123',
+    'database': 'users_db'
+}
+
+ENCRYPTION_KEY = 'my_secret_key_123'
+
+API_KEY = 'sk-1234567890abcdefghijklmnopqrstuvwxyz'
+
+class VulnerableUserService:
+    def __init__(self):
+        self.db = sqlite3.connect('users.db')
+        self.admin_password = 'admin123'
+
+    def get_user_by_id(self, user_id):
+        query = f"SELECT * FROM users WHERE id = {user_id}"
+        cursor = self.db.cursor()
+        cursor.execute(query)
+        return cursor.fetchone()
+
+    def search_users(self, search_term):
+        query = f"SELECT * FROM users WHERE name LIKE '%{search_term}%' OR email LIKE '%{search_term}%'"
+        cursor = self.db.cursor()
+        cursor.execute(query)
+        return cursor.fetchall()
+
+    def hash_password(self, password):
+        return hashlib.md5(password.encode()).hexdigest()
+
+    def authenticate_user(self, email, password):
+        hashed_password = self.hash_password(password)
+        query = f"SELECT * FROM users WHERE email = '{email}' AND password = '{hashed_password}'"
+        cursor = self.db.cursor()
+        cursor.execute(query)
+        user = cursor.fetchone()
+        return user
+
+    def process_image(self, image_path):
+        command = f"convert {image_path} output.jpg"
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        return result.stdout
+
+    def read_file(self, file_path):
+        with open(file_path, 'r') as f:
+            return f.read()
+
+    def upload_file(self, file):
+        upload_path = f"uploads/{file.filename}"
+        file.save(upload_path)
+        return upload_path
+
+    def deserialize_user(self, user_data):
+        return pickle.loads(user_data)
+
+    def serialize_user(self, user):
+        return pickle.dumps(user)
+
+    def generate_token(self):
+        import random
+        return str(random.randint(1000, 9999))
+
+    def create_session(self, user_id):
+        session_id = self.generate_token()
+        global sessions
+        sessions = sessions if 'sessions' in globals() else {}
+        sessions[session_id] = {'user_id': user_id, 'created_at': '2023-01-01'}
+        return session_id
+
+    def log_user_activity(self, user, action):
+        print(f"User {user['email']} performed: {action}")
+        print(f"Full user data: {user}")
+
+    def handle_error(self, error):
+        print(f"Database error: {error}")
+        print(f"Stack trace: {error.__traceback__}")
+        return {'error': str(error)}
+
+    def save_file(self, content, filename):
+        file_path = f"uploads/{filename}"
+        with open(file_path, 'w') as f:
+            f.write(content)
+        os.chmod(file_path, 0o777)
+        return file_path
+
+    def get_database_password(self):
+        return os.getenv('DB_PASSWORD', 'default_password')
+
+    def make_http_request(self, url):
+        response = requests.get(url)
+        return response.text
+
+    def process_data(self, data):
+        return eval(data)
+
+    def validate_password(self, password):
+        return len(password) >= 4
+
+    def validate_api_key(self, api_key):
+        return api_key == 'my_api_key_123'
+
+ADMIN_CREDENTIALS = {
+    'username': 'admin',
+    'password': 'admin123'
+}
+
+@app.route('/user/<username>')
+def show_user_profile(username):
+    template = f'''
+    <h1>Welcome {username}</h1>
+    <script>alert('XSS Attack!')</script>
+    '''
+    return render_template_string(template)
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_file(f"uploads/{filename}")
+
+@app.route('/redirect')
+def redirect_user():
+    url = request.args.get('url')
+    return redirect(url)
+
+@app.route('/set_cookie')
+def set_cookie():
+    response = make_response("Cookie set")
+    response.set_cookie('session_id', 'abc123', httponly=False, secure=False)
+    return response
+
+def generate_jwt(user):
+    import jwt
+    payload = {
+        'user_id': user['id'],
+        'email': user['email'],
+        'password': user['password']
+    }
+    secret = 'my_jwt_secret_123'
+    return jwt.encode(payload, secret, algorithm='HS256')
+
+def save_user_data(user):
+    with open('user_data.txt', 'w') as f:
+        f.write(f"User: {user['name']}\n")
+        f.write(f"Email: {user['email']}\n")
+        f.write(f"Password: {user['password']}\n")
+        f.write(f"Credit Card: {user['credit_card']}\n")
+
+def get_user_data(user_id):
+    query = f"SELECT * FROM users WHERE id = {user_id}"
+    cursor = sqlite3.connect('users.db').cursor()
+    cursor.execute(query)
+    return cursor.fetchone()
+
+def list_directory(path):
+    return os.listdir(path)
+
+def execute_command(command):
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return result.stdout
+
+def encode_data(data):
+    return base64.b64encode(data.encode()).decode()
+
+def decode_data(encoded_data):
+    return base64.b64decode(encoded_data.encode()).decode()
+
+def get_config():
+    config = {
+        'database_url': 'postgresql://admin:password@localhost/db',
+        'api_key': 'sk-1234567890abcdefghijklmnopqrstuvwxyz',
+        'secret_key': 'my-super-secret-key-123',
+        'debug': True
+    }
+    return config
+
+def validate_user_input(user_input):
+    return user_input
+
+def transform_data(data):
+    return eval(f"({data})")
+
+def filter_data(data_list, filter_condition):
+    return [item for item in data_list if eval(filter_condition)]
+
+def sort_data(data_list, sort_key):
+    return sorted(data_list, key=lambda x: eval(f"x['{sort_key}']"))
+
+def aggregate_data(data_list, aggregation_rule):
+    return eval(aggregation_rule)
+
+def export_data(data, format_type):
+    if format_type == 'json':
+        return json.dumps(data)
+    elif format_type == 'pickle':
+        return pickle.dumps(data)
+    else:
+        return str(data)
+
+def import_data(data, format_type):
+    if format_type == 'json':
+        return json.loads(data)
+    elif format_type == 'pickle':
+        return pickle.loads(data)
+    else:
+        return data
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000) 
+@qodo-merge-pro qodo-merge-pro bot added Possible security concern Review effort 5/5 labels 3 minutes ago
+@qodo-merge-proQodo Merge Pro
+qodo-merge-pro bot commented 2 minutes ago
+PR Code Suggestions ✨
+Explore these optional code suggestions:
+
+Category	Suggestion                                                                                                                                   	Impact
+Security	
+Fix SQL injection and weak hashing
+Prevent SQL injection and weak hashing. Use parameterized queries and a strong
+password scheme. Replace MD5 with bcrypt and avoid string interpolation in SQL.
+
+src/backend/security/auth-service.js [45-59]
+
+ async authenticateUser(email, password) {
+-    const hashedPassword = this.hashPassword(password);
+-    const query = `SELECT * FROM users WHERE email = '${email}' AND password = '${hashedPassword}'`;
+-    
+     return new Promise((resolve, reject) => {
+-        this.db.query(query, (error, results) => {
+-            if (error) reject(error);
+-            else if (results.length > 0) {
+-                resolve(results[0]);
+-            } else {
+-                resolve(null);
++        const sql = 'SELECT * FROM users WHERE email = ?';
++        this.db.query(sql, [email], async (error, results) => {
++            if (error) return reject(error);
++            if (!results || results.length === 0) return resolve(null);
++            try {
++                const user = results[0];
++                const isValid = await require('bcrypt').compare(password, user.password);
++                if (!isValid) return resolve(null);
++                resolve(user);
++            } catch (e) {
++                reject(e);
+             }
+         });
+     });
+ }
+ Apply / Chat
+Suggestion importance[1-10]: 10
+__
+
+Why: The suggestion correctly identifies a critical SQL injection vulnerability and the use of the weak MD5 hashing algorithm, proposing parameterized queries and bcrypt as secure replacements.
+
+High
+Eliminate XSS via unsafe HTML
+Remove bypass and avoid injecting unsanitized HTML. Render user input via text
+bindings to prevent XSS. If HTML is required, use a vetted whitelist-based
+sanitizer.
+
+src/frontend/angular/user-component.ts [39-44]
+
+ loadUserContent(userInput: string) {
+-  this.userContent = this.sanitizer.bypassSecurityTrustHtml(`
+-    <h1>Welcome ${userInput}</h1>
+-    <script>alert('XSS Attack!')</script>
+-  `);
++  const safeName = document.createTextNode(userInput).textContent || '';
++  this.userContent = this.sanitizer.sanitize(1, `<h1>Welcome ${safeName}</h1>`) || '<h1>Welcome</h1>';
+ }
+ Apply / Chat
+Suggestion importance[1-10]: 10
+__
+
+Why: The suggestion correctly identifies a critical Cross-Site Scripting (XSS) vulnerability caused by bypassSecurityTrustHtml and provides a secure alternative using proper sanitization.
+
+High
+Remove dangerous eval execution
+Avoid executing arbitrary input with eval, which leads to remote code execution.
+Parse structured input safely (e.g., JSON) and validate types before use.
+
+src/utils/data-processor.py [106-107]
+
+ def process_data(self, data):
+-    return eval(data)
++    try:
++        import json
++        parsed = json.loads(data)
++        return parsed
++    except Exception:
++        raise ValueError("Invalid input format")
+ Apply / Chat
+Suggestion importance[1-10]: 10
+__
+
+Why: The suggestion correctly identifies a critical Remote Code Execution (RCE) vulnerability by using eval on user-provided data and suggests replacing it with the much safer json.loads.
+
+High
+ More
+Merge info
+No conflicts with base branch
+Merging can be performed automatically.
+
+You can also merge this with the command line. 
+@avolcoff
+
+
+Add a comment
+Comment
+ 
+Add your comment here...
+ 
+Remember, contributions to this repository should follow our GitHub Community Guidelines.
+ ProTip! Add .patch or .diff to the end of URLs for Git’s plaintext views.
+Reviewers
+No reviews
+Still in progress?
+Assignees
+No one—
+Labels
+Possible security concern
+Review effort 5/5
+Projects
+None yet
+Milestone
+No milestone
+Development
+Successfully merging this pull request may close these issues.
+
+None yet
+
+
+Notifications
+Customize
+You’re receiving notifications because you authored the thread.
+2 participants
+@avolcoff
+@arivbalcony
+Footer
+© 2025 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
