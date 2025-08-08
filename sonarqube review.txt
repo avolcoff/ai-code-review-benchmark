@@ -1,0 +1,965 @@
+Skip to main contentSkip to issue filters
+My Projects
+My Issues
+Explore
+Upgrade
+
+
+
+
+1
+
+
+
+
+avolcoff
+avolcoffai-code-review-benchmarkPull Requests20 – sonarqube pr
+GitHub
+Summary
+Issues
+Security Hotspots
+Measures
+Code
+The last analysis has a warning.
+See details
+ai-code-review-benchmark
+
+Public
+github
+
+
+Overview
+!
+Main Branch
+)
+Pull Requests
+1
+&
+Branches
+1
+
+Information
+
+
+Administration
+
+
+Collapse
+Filters
+Software Quality
+Severity
+
+Clean Code Attribute
+Type
+Type Severity
+
+Status
+Security Category
+Creation Date
+Language
+Rule
+Tag
+Directory
+File
+Assignee
+Author
+
+Bulk Change
+Select issues
+
+
+Navigate to issue
+
+
+
+57issues
+6h 48min effort
+src/backend/security/auth-service.js
+Remove this useless assignment to variable "secret".
+Intentionality
+Maintainability
+
+2
+Medium
+cwe
+unused
++
+Open
+Not assigned
+L107
+1min effort
+20 minutes ago
+Code Smell
+Major
+Remove the declaration of the unused 'secret' variable.
+Intentionality
+Maintainability
+
+3
+Low
+unused
++
+Open
+Not assigned
+L107
+5min effort
+20 minutes ago
+Code Smell
+Minor
+src/backend/services/user-service.js
+Expected non-Promise value in a boolean conditional.
+Intentionality
+Reliability
+
+2
+Medium
+async
+promise
+...
++
+Open
+Not assigned
+L144
+5min effort
+20 minutes ago
+Bug
+Major
+Expected non-Promise value in a boolean conditional.
+Intentionality
+Reliability
+
+2
+Medium
+async
+promise
+...
++
+Open
+Not assigned
+L170
+5min effort
+20 minutes ago
+Bug
+Major
+Expected non-Promise value in a boolean conditional.
+Intentionality
+Reliability
+
+2
+Medium
+async
+promise
+...
++
+Open
+Not assigned
+L220
+5min effort
+20 minutes ago
+Bug
+Major
+src/frontend/angular/user-component.ts
+Member 'apiKey' is never reassigned; mark it as `readonly`.
+Intentionality
+Maintainability
+
+2
+Medium
+confusing
+type-dependent
++
+Open
+Not assigned
+L26
+2min effort
+20 minutes ago
+Code Smell
+Major
+Member 'jwtSecret' is never reassigned; mark it as `readonly`.
+Intentionality
+Maintainability
+
+2
+Medium
+confusing
+type-dependent
++
+Open
+Not assigned
+L27
+2min effort
+20 minutes ago
+Code Smell
+Major
+Member 'http: HttpClient' is never reassigned; mark it as `readonly`.
+Intentionality
+Maintainability
+
+2
+Medium
+confusing
+type-dependent
++
+Open
+Not assigned
+L30
+2min effort
+20 minutes ago
+Code Smell
+Major
+Member 'sanitizer: DomSanitizer' is never reassigned; mark it as `readonly`.
+Intentionality
+Maintainability
+
+2
+Medium
+confusing
+type-dependent
++
+Open
+Not assigned
+L31
+2min effort
+20 minutes ago
+Code Smell
+Major
+Member 'router: Router' is never reassigned; mark it as `readonly`.
+Intentionality
+Maintainability
+
+2
+Medium
+confusing
+type-dependent
++
+Open
+Not assigned
+L32
+2min effort
+20 minutes ago
+Code Smell
+Major
+src/mobile/android/user-manager.kt
+Remove this unused import.
+Intentionality
+Maintainability
+
+3
+Low
+unused
++
+Open
+Not assigned
+L6
+1min effort
+20 minutes ago
+Code Smell
+Minor
+Remove this unused import.
+Intentionality
+Maintainability
+
+3
+Low
+unused
++
+Open
+Not assigned
+L11
+1min effort
+20 minutes ago
+Code Smell
+Minor
+Remove this unused "data" local variable.
+Intentionality
+Maintainability
+
+3
+Low
+unused
++
+Open
+Not assigned
+L36
+5min effort
+20 minutes ago
+Code Smell
+Minor
+Remove this cast that can never succeed.
+Intentionality
+Maintainability
+
+2
+Medium
+No tags
++
+Open
+Not assigned
+L109
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove this cast that can never succeed.
+Intentionality
+Maintainability
+
+2
+Medium
+No tags
++
+Open
+Not assigned
+L110
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove this cast that can never succeed.
+Intentionality
+Maintainability
+
+2
+Medium
+No tags
++
+Open
+Not assigned
+L111
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove this unused "user" local variable.
+Intentionality
+Maintainability
+
+3
+Low
+unused
++
+Open
+Not assigned
+L125
+5min effort
+20 minutes ago
+Code Smell
+Minor
+Do something with the "Boolean" value returned by "setReadable".
+Intentionality
+Reliability
+
+3
+Low
+cwe
+error-handling
++
+Open
+Not assigned
+L183
+15min effort
+20 minutes ago
+Bug
+Minor
+Do something with the "Boolean" value returned by "setWritable".
+Intentionality
+Reliability
+
+3
+Low
+cwe
+error-handling
++
+Open
+Not assigned
+L184
+15min effort
+20 minutes ago
+Bug
+Minor
+Do something with the "Boolean" value returned by "setExecutable".
+Intentionality
+Reliability
+
+3
+Low
+cwe
+error-handling
++
+Open
+Not assigned
+L185
+15min effort
+20 minutes ago
+Bug
+Minor
+Add a nested comment explaining why this function is empty or complete the implementation.
+Intentionality
+Maintainability
+
+4
+High
+suspicious
++
+Open
+Not assigned
+L332
+5min effort
+20 minutes ago
+Code Smell
+Critical
+Remove these unused function parameters.
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L332
+5min effort
+20 minutes ago
+Code Smell
+Major
+Add a nested comment explaining why this function is empty or complete the implementation.
+Intentionality
+Maintainability
+
+4
+High
+suspicious
++
+Open
+Not assigned
+L333
+5min effort
+20 minutes ago
+Code Smell
+Critical
+Remove this unused function parameter "user".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L333
+5min effort
+20 minutes ago
+Code Smell
+Major
+Add a nested comment explaining why this function is empty or complete the implementation.
+Intentionality
+Maintainability
+
+4
+High
+suspicious
++
+Open
+Not assigned
+L334
+5min effort
+20 minutes ago
+Code Smell
+Critical
+Remove these unused function parameters.
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L334
+5min effort
+20 minutes ago
+Code Smell
+Major
+Add a nested comment explaining why this function is empty or complete the implementation.
+Intentionality
+Maintainability
+
+4
+High
+suspicious
++
+Open
+Not assigned
+L335
+5min effort
+20 minutes ago
+Code Smell
+Critical
+Remove these unused function parameters.
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L335
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove this unused function parameter "data".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L336
+5min effort
+20 minutes ago
+Code Smell
+Major
+Add a nested comment explaining why this function is empty or complete the implementation.
+Intentionality
+Maintainability
+
+4
+High
+suspicious
++
+Open
+Not assigned
+L345
+5min effort
+20 minutes ago
+Code Smell
+Critical
+Add a nested comment explaining why this function is empty or complete the implementation.
+Intentionality
+Maintainability
+
+4
+High
+suspicious
++
+Open
+Not assigned
+L346
+5min effort
+20 minutes ago
+Code Smell
+Critical
+Make this interface functional or replace it with a function type.
+Intentionality
+Maintainability
+
+2
+Medium
+No tags
++
+Open
+Not assigned
+L361
+5min effort
+20 minutes ago
+Code Smell
+Major
+src/mobile/ios/user-manager.swift
+Refactor your code to get this URI from a customizable parameter.
+Consistency
+Maintainability
+
+3
+Low
+No tags
++
+Open
+Not assigned
+L45
+20min effort
+20 minutes ago
+Code Smell
+Minor
+Refactor your code to get this URI from a customizable parameter.
+Consistency
+Maintainability
+
+3
+Low
+No tags
++
+Open
+Not assigned
+L255
+20min effort
+20 minutes ago
+Code Smell
+Minor
+Refactor your code to get this URI from a customizable parameter.
+Consistency
+Maintainability
+
+3
+Low
+No tags
++
+Open
+Not assigned
+L282
+20min effort
+20 minutes ago
+Code Smell
+Minor
+Remove the unused function parameter "decoder".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L385
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "query".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L395
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "query".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L396
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "fromAccount".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L397
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "toAccount".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L397
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "amount".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L397
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "createdAt".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L398
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "content".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L398
+5min effort
+20 minutes ago
+Code Smell
+Major
+Add a nested comment explaining why this function is empty, or complete the implementation.
+Intentionality
+Maintainability
+
+4
+High
+suspicious
++
+Open
+Not assigned
+L401
+5min effort
+20 minutes ago
+Code Smell
+Critical
+Remove the unused function parameter "user".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L401
+5min effort
+20 minutes ago
+Code Smell
+Major
+Add a nested comment explaining why this function is empty, or complete the implementation.
+Intentionality
+Maintainability
+
+4
+High
+suspicious
++
+Open
+Not assigned
+L402
+5min effort
+20 minutes ago
+Code Smell
+Critical
+Remove the unused function parameter "email".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L402
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "token".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L402
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "data".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L403
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "secret".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L406
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "token".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L406
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "payload".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L407
+5min effort
+20 minutes ago
+Code Smell
+Major
+Remove the unused function parameter "secret".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L407
+5min effort
+20 minutes ago
+Code Smell
+Major
+src/utils/data-processor.py
+Change this code to not construct HTML content directly from user-controlled data.
+Intentionality
+Security
+
+1
+Blocker
+cwe
+python3
++
+Open
+Not assigned
+L126
+30min effort
+20 minutes ago
+Vulnerability
+Blocker
+Change this code to not construct the path from user-controlled data.
+Intentionality
+Security
+
+1
+Blocker
+cwe
++
+Open
+Not assigned
+L130
+30min effort
+20 minutes ago
+Vulnerability
+Blocker
+Change this code to not perform redirects based on user-controlled data.
+Intentionality
+Security
+
+1
+Blocker
+cwe
++
+Open
+Not assigned
+L135
+30min effort
+20 minutes ago
+Vulnerability
+Blocker
+Remove the unused function parameter "data_list".
+Intentionality
+Maintainability
+
+2
+Medium
+unused
++
+Open
+Not assigned
+L200
+5min effort
+20 minutes ago
+Code Smell
+Major
+57 of 57 shown
+© 2018-2025 SonarSource SA. All rights reserved.
+Terms (opens in new tab)
+Pricing
+Privacy
+Cookie Policy
+Security
+Community
+Documentation
+Contact us
+Status
+About

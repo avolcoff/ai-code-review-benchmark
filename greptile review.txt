@@ -1,0 +1,280 @@
+Skip to content
+Navigation Menu
+avolcoff
+ai-code-review-benchmark
+
+Type / to search
+Code
+Issues
+Pull requests
+6
+Actions
+Projects
+Wiki
+Security
+1
+Insights
+Settings
+Greptile pr (medium - default) #13
+ Open
+avolcoff wants to merge 4 commits into main from greptile-pr-medium  
++9,028 −0 
+ Conversation 60
+ Commits 4
+ Checks 0
+ Files changed 16
+Conversation
+avolcoff
+Owner
+avolcoff commented 2 hours ago
+No description provided.
+
+arivbalcony added 2 commits 2 hours ago
+@arivbalcony
+updated
+60fcc9b
+@arivbalcony
+updated
+49c0458
+greptile-apps[bot]
+greptile-apps bot reviewed 2 hours ago
+greptile-apps bot left a comment
+Greptile Summary
+This PR establishes a comprehensive multi-platform user management system designed as an AI code review benchmark. The changes introduce a complete application stack including Node.js/Express backend with JWT authentication, Angular frontend component, iOS Swift and Android Kotlin mobile implementations, and Python utilities. The project is structured with proper package management (package.json), environment configuration (env.example), and comprehensive documentation (README.md).
+
+The codebase intentionally contains numerous security vulnerabilities across all platforms to serve as a testing ground for AI code review tools. This is evidenced by class names like VulnerableUserService, SecurityIssuesActivity, and VulnerableComponent, along with the repository name 'ai-code-review-benchmark'. The system includes both legitimate production-style code (proper Express setup, security middleware, bcrypt hashing) and deliberately vulnerable implementations featuring SQL injection, XSS attacks, command injection, hardcoded secrets, and weak authentication patterns.
+
+Two AI code review outputs are also included (greptile review high.txt and coderabbit review.txt), suggesting this benchmark is being used to compare different automated review tools' capabilities in detecting security vulnerabilities across multiple programming languages and platforms.
+
+Important Files Changed
+Click to expand file changes
+Confidence score: 1/5
+This PR requires extreme caution as it contains numerous intentionally vulnerable components that would cause immediate security breaches if deployed
+Score reflects the deliberate inclusion of critical security vulnerabilities across all platform implementations, despite being designed for testing purposes
+Pay close attention to app.js, src/backend/services/user-service.js, and all security-related service files which contain production-breaking issues
+Sequence Diagram
+
+13 files reviewed, 59 comments
+
+Edit Code Review Bot Settings | Greptile
+
+package.json
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "jest",
+    "lint": "eslint src/**/*.js",
+@greptile-apps greptile-apps bot 2 hours ago
+style: ESLint pattern only targets JavaScript files but codebase includes TypeScript, Python, Kotlin, and Swift files
+
+@avolcoff	Reply...
+coderabbit review.txt
+Comment on lines +1 to +50
+Skip to content
+Navigation Menu
+avolcoff
+ai-code-review-benchmark
+
+Type / to search
+Code
+Issues
+Pull requests
+2
+Actions
+Projects
+Wiki
+Security
+1
+Insights
+Settings
+Coderabbit pr #11
+✨ 
+ Open
+avolcoff wants to merge 2 commits into main from coderabbit-pr  
++2,213 −0 
+ Conversation 91
+ Commits 2
+ Checks 0
+ Files changed 11
+ Open
+Coderabbit pr
+#11
+
+File filter 
+
+0 / 11 files viewed
+Filter changed files
+ 114 changes: 114 additions & 0 deletions114  
+.gitignore
+Viewed
+Original file line number	Diff line number	Diff line change
+@@ -0,0 +1,114 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+@greptile-apps greptile-apps bot 2 hours ago
+logic: This file contains CodeRabbit review output with GitHub UI elements rather than source code. It should not be committed to the repository.
+
+@avolcoff	Reply...
+src/utils/cache-manager.js
+Comment on lines +18 to +21
+        for (let user of users) {
+            const posts = await this.getUserPosts(user.id);
+            user.posts = posts;
+        }
+@greptile-apps greptile-apps bot 2 hours ago
+logic: N+1 query problem - this will execute one query per user plus the initial query, causing severe performance issues with large datasets
+
+@avolcoff	Reply...
+src/utils/cache-manager.js
+        const results = [];
+
+        for (let file of files) {
+            const content = fs.readFileSync(file, 'utf8');
+@greptile-apps greptile-apps bot 2 hours ago
+logic: Synchronous file operation in async function blocks the event loop - use fs.readFile or fs.promises.readFile instead
+
+Suggested change
+            const content = fs.readFileSync(file, 'utf8');
+            const content = await fs.promises.readFile(file, 'utf8');
+@avolcoff	Reply...
+src/utils/cache-manager.js
+Comment on lines +109 to +112
+        for (let user of users) {
+            const posts = await this.getUserPosts(user.id);
+            const comments = await this.getUserComments(user.id);
+            const likes = await this.getUserLikes(user.id);
+@greptile-apps greptile-apps bot 2 hours ago
+logic: Multiple N+1 queries per user will cause exponential performance degradation - consider using JOIN queries or batch operations
+
+@avolcoff	Reply...
+49 hidden conversations
+Load more…
+src/backend/services/user-service.js
+            }
+
+            // Check if user is requesting their own data or is admin
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+@greptile-apps greptile-apps bot 2 hours ago
+logic: this.isAdmin() returns a Promise but is used synchronously here. This will always evaluate to true since Promises are truthy objects. Use await this.isAdmin(requestingUserId) instead.
+
+Suggested change
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+            if (userId !== requestingUserId && !(await this.isAdmin(requestingUserId))) {
+@avolcoff	Reply...
+src/mobile/android/user-manager.kt
+    }
+
+    fun searchUsers(query: String): List<User> {
+        val sqlQuery = "SELECT * FROM users WHERE name LIKE '%$query%'"
+@greptile-apps greptile-apps bot 2 hours ago
+logic: SQL injection vulnerability in search query construction
+
+Suggested change
+        val sqlQuery = "SELECT * FROM users WHERE name LIKE '%$query%'"
+        val sqlQuery = "SELECT * FROM users WHERE name LIKE ?"
+@avolcoff	Reply...
+src/backend/services/user-service.js
+            }
+
+            // Check authorization
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+@greptile-apps greptile-apps bot 2 hours ago
+logic: Same async/sync issue - this.isAdmin() returns a Promise but is used without await, causing authorization bypass.
+
+Suggested change
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+            if (userId !== requestingUserId && !(await this.isAdmin(requestingUserId))) {
+@avolcoff	Reply...
+src/mobile/android/user-manager.kt
+Comment on lines +183 to +185
+        file.setReadable(true, false)
+        file.setWritable(true, false)
+        file.setExecutable(true, false)
+@greptile-apps greptile-apps bot 2 hours ago
+logic: File permissions set to world-readable/writable/executable
+
+@avolcoff	Reply...
+src/backend/services/user-service.js
+            }
+
+            // Only allow users to delete their own account or admin to delete any
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+@greptile-apps greptile-apps bot 2 hours ago
+logic: Authorization bypass: this.isAdmin() returns a Promise but used synchronously, allowing unauthorized deletions.
+
+Suggested change
+            if (userId !== requestingUserId && !this.isAdmin(requestingUserId)) {
+            if (userId !== requestingUserId && !(await this.isAdmin(requestingUserId))) {
+@avolcoff	Reply...
+arivbalcony added 2 commits 1 hour ago
+@arivbalcony
+updated
+09e3895
+@arivbalcony
+updated
+49c48c8
+This was referenced 1 hour ago
+Qodo pr #14
+ Closed
+Qodo pr #15
+ Closed
+@avolcoff avolcoff changed the title Greptile pr medium Greptile pr (medium - default) 1 minute ago
+Merge info
+No conflicts with base branch
+Merging can be performed automatically.
+
+You can also merge this with the command line. 
+@avolcoff
+
+
+Add a comment
+Comment
+ 
+Add your comment here...
+ 
+Remember, contributions to this repository should follow our GitHub Community Guidelines.
+ ProTip! Add comments to specific lines under Files changed.
+Reviewers
+@greptile-apps
+greptile-apps[bot]
+Still in progress?
+Assignees
+No one—
+Labels
+None yet
+Projects
+None yet
+Milestone
+No milestone
+Development
+Successfully merging this pull request may close these issues.
+
+None yet
+
+
+Notifications
+Customize
+You’re receiving notifications because you authored the thread.
+2 participants
+@avolcoff
+@arivbalcony
+Footer
+© 2025 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+This was referenced Qodo pr #14 Closed Qodo pr #15 Closed avolcoff changed the title Greptile pr medium Greptile pr (medium - default)

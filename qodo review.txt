@@ -1,0 +1,174 @@
+Skip to content
+Navigation Menu
+avolcoff
+ai-code-review-benchmark
+
+Type / to search
+Code
+Issues
+Pull requests
+6
+Actions
+Projects
+Wiki
+Security
+1
+Insights
+Settings
+Qodo pr #16
+ Open
+avolcoff wants to merge 6 commits into main from qodo-pr  
+ Open
+Qodo pr
+#16
+avolcoff wants to merge 6 commits into main from qodo-pr 
++3,049 −0 
+ Conversation 2
+ Commits 6
+ Checks 0
+ Files changed 13
+Conversation
+avolcoff
+Owner
+avolcoff commented 1 hour ago • 
+PR Type
+Other
+
+Description
+Create multi-platform user management system with security vulnerabilities
+
+Add backend services with authentication and user management
+
+Implement frontend Angular component with XSS vulnerabilities
+
+Include mobile implementations for iOS and Android platforms
+
+Diagram Walkthrough
+
+File Walkthrough
+arivbalcony added 5 commits 2 hours ago
+@arivbalcony
+updated
+60fcc9b
+@arivbalcony
+updated
+49c0458
+@arivbalcony
+updated
+09e3895
+@arivbalcony
+updated
+49c48c8
+@arivbalcony
+Remove review files from git tracking to prevent benchmark hints
+d81b99a
+@qodo-merge-proQodo Merge Pro
+qodo-merge-pro bot commented 1 hour ago
+PR Reviewer Guide 🔍
+Here are some key observations to aid the review process:
+
+⏱️ Estimated effort to review: 5 🔵🔵🔵🔵🔵
+🧪 No relevant tests
+🔒 Security concerns
+
+Extensive vulnerabilities:
+
+Hardcoded secrets/credentials across repo (env.example sensitive placeholders; auth-service.js lines with DB creds and JWT secret; Angular/iOS/Android hardcoded API keys/secrets).
+SQL injection: Direct string interpolation in SQL queries (auth-service.js getUserById/search/authenticate; Angular building SQL in client; data-processor.py multiple queries; mobile platforms too).
+Weak cryptography: MD5 for password hashing (JS, Kotlin, Swift), insecure random tokens (Math.random/Random), base64 “tokens”.
+Command injection/unsafe execution: exec/Runtime/Process with unvalidated paths/commands (image processing).
+XSS: Rendering unsanitized HTML and explicit script tags in backend rendering and Angular component; Flask render_template_string with f-strings; mobile WebView loadData with user input.
+Insecure deserialization: eval in JS and Angular, pickle loads, JSON.parse of untrusted with secrets, Kotlin ScriptEngine eval.
+Sensitive data exposure: Logging full user objects and errors with stacks; displaying/storing passwords and credit cards; plaintext storage in files and local/session storage.
+Insecure cookies/session: httpOnly false, secure false, SameSite none; global sessions without protection.
+File handling: Unvalidated file paths, world-writable permissions (0o777), reading arbitrary files, directory listing.
+Open redirect: Client and server-side redirects to arbitrary URLs.
+Performance issues: N+1 queries and synchronous FS operations in Node utils.
+These must be addressed before merge.
+
+⚡ Recommended focus areas for review
+
+Multiple Critical Vulns
+Hardcoded secrets, SQL injection via string interpolation, weak MD5 password hashing, insecure token generation/encoding (base64), XSS in HTML render, unsafe exec of system commands, insecure cookies, eval-based deserialization, broad file/FS access, and logging of sensitive data. Validate and replace with parameterized queries, strong hashing, proper JWT, sanitization, safe exec, secure cookie flags, and remove secrets from code.
+
+XSS and Secret Leakage
+Uses bypassSecurityTrustHtml with user input enabling XSS, displays plaintext passwords, hardcoded API/JWT secrets in client, builds SQL query from user input, stores sensitive data in local/session storage, eval on input, open redirects, insecure cookies, logs PII. Remove secrets, sanitize/escape, use server-side parameterized queries and safe templating, and avoid storing sensitive data client-side.
+
+Code Injection/Unsafe Ops
+SQL injection via f-strings, MD5 hashing, shell=True command execution, pickle (RCE), eval usage, insecure JWT payload including password, insecure cookies, open redirect, XSS via render_template_string, sensitive data logging/storage, world-writable files. Replace with parameterized queries, safe serializers, no eval/pickle, proper JWT, and secure cookie/FS handling.
+
+@qodo-merge-pro qodo-merge-pro bot added Possible security concern Review effort 5/5 labels 1 hour ago
+@qodo-merge-proQodo Merge Pro
+qodo-merge-pro bot commented 1 hour ago
+PR Code Suggestions ✨
+Explore these optional code suggestions:
+
+Category	Suggestion                                                                                                                                   	Impact
+Security	
+Fix SQL injection and weak hashing
+High
+Eliminate XSS via unsafe HTML
+High
+Remove dangerous eval execution
+High
+ More
+New changes since you last viewed
+@arivbalcony
+updated
+e4abc29
+This was referenced 1 hour ago
+updated #17
+ Closed
+Cherry-pick e4abc29d onto Codeant-pr #18
+ Closed
+Merge info
+No conflicts with base branch
+Merging can be performed automatically.
+
+You can also merge this with the command line. 
+@avolcoff
+
+
+Add a comment
+Comment
+ 
+Add your comment here...
+ 
+Remember, contributions to this repository should follow our GitHub Community Guidelines.
+ ProTip! Add .patch or .diff to the end of URLs for Git’s plaintext views.
+Reviewers
+No reviews
+Still in progress?
+Assignees
+No one—
+Labels
+Possible security concern
+Review effort 5/5
+Projects
+None yet
+Milestone
+No milestone
+Development
+Successfully merging this pull request may close these issues.
+
+None yet
+
+
+Notifications
+Customize
+You’re receiving notifications because you authored the thread.
+2 participants
+@avolcoff
+@arivbalcony
+Footer
+© 2025 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+Qodo pr by avolcoff · Pull Request #16 · avolcoff/ai-code-review-benchmark

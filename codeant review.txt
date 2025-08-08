@@ -1,0 +1,170 @@
+Skip to content
+Navigation Menu
+avolcoff
+ai-code-review-benchmark
+
+Type / to search
+Code
+Issues
+Pull requests
+6
+Actions
+Projects
+Wiki
+Security
+1
+Insights
+Settings
+CodeAnt-pr - current Best #19
+ Open
+avolcoff wants to merge 1 commit into main from Codeant-pr  
++2,099 −0 
+ Conversation 3
+ Commits 1
+ Checks 0
+ Files changed 10
+Conversation
+avolcoff
+Owner
+avolcoff commented 41 minutes ago • 
+CodeAnt-AI Description
+added README.md with project overview, features, structure, technology stack, setup instructions, contributing guidelines, and license information
+created app.js Express server entrypoint with security middleware (helmet, cors, rate limiting), JSON and URL-encoded body parsing, health check and API routes, error and 404 handling
+introduced env.example file defining environment variables for database, JWT, server, security, external services, and logging configuration
+implemented secure UserService in src/backend/services providing user creation, authentication, retrieval, update, and deletion with input validation, bcrypt hashing, and JWT token generation
+included VulnerableUserService in src/backend/security illustrating insecure patterns such as raw SQL queries, weak hashing, XSS, unsafe file operations, and global session storage
+developed VulnerableComponent Angular frontend in src/frontend/angular for user search, login, content sanitization bypass, file upload, token generation, and error handling demonstrations
+added native mobile implementations: Android in src/mobile/android/user-manager.kt and iOS in src/mobile/ios/user-manager.swift showcasing user management, XSS risks, file operations, and security pitfalls
+provided utilities: src/utils/cache-manager.js for database caching and performance methods, and src/utils/data-processor.py offering Python-based data processing, Flask endpoints, and serialization routines
+This PR establishes the initial scaffold for a multi-platform user management system, delivering comprehensive documentation, server setup, secure and example vulnerable services, front-end and mobile clients, and utility modules. It lays a robust foundation for further development, testing, and security reviews.
+
+💡 Usage Guide
+@arivbalcony
+updated
+a3fe8c9
+@codeant-aiCodeAnt AI
+codeant-ai bot commented 41 minutes ago
+CodeAnt AI is reviewing your PR.
+
+@codeant-ai codeant-ai bot added the size:XXL label 40 minutes ago
+@codeant-aiCodeAnt AI
+codeant-ai bot commented 36 minutes ago
+Pull Request Feedback 🔍
+🔒 Security concerns
+
+Sensitive information exposure:
+The code includes hardcoded secrets such as SECRET_API_KEY_123, my-super-secret-key-123, and database connection strings in getConfig(). SQL injection: Queries like SELECT * FROM users WHERE id = \(userId) and LIKE '%\(query)%' use unescaped user input. XSS: loadUserContent inserts unsanitized userInput into HTML. Shell injection: Commands built with untrusted parameters (convert \(imagePath) and executeCommand).
+
+Sensitive information exposure: Hard-coded API keys and JWT secrets are present in the code (lines 15-17), risking leak if code is shared.
+SQL injection: Dynamic SQL queries are constructed with user input in getUserById (line 18) and searchUsers (line 174) without sanitization.
+Cross-site scripting (XSS): Unescaped user input is injected into HTML loaded by WebView in userProfileTapped (line 25).
+Command injection: External commands executed via Runtime.exec with unvalidated input in processImage (line 40) and executeCommand (line 271).
+Weak cryptography: MD5 is used for password hashing (line 46), which is insecure and vulnerable to collisions.
+
+Authorization bypass: the admin check using this.isAdmin is not awaited, allowing unauthorized users to bypass access control.
+
+Sensitive information exposure: Hard-coded database credentials in cache-manager.js should be moved to environment variables or a secure configuration store.
+
+Sensitive information exposure: Hard-coded credentials and secrets are present (DB_CONFIG password, ENCRYPTION_KEY, API_KEY, JWT secret).
+SQL injection: Use of f-strings in SQL queries with unvalidated inputs.
+Command injection: subprocess.run with shell=True on unescaped data.
+Code injection: Unsafe eval() calls on user-controlled data.
+Insecure deserialization: pickle.loads on untrusted input.
+Cross-site scripting (XSS): render_template_string includes unescaped user input in HTML.
+Insecure cookie settings: Cookies set with httponly=False and secure=False.
+
+Multiple security vulnerabilities: This PR introduces hard-coded secrets (API key and JWT secret), client-side SQL query construction vulnerable to SQL injection, use of bypassSecurityTrustHtml with untrusted input leading to XSS, use of eval on user input enabling arbitrary code execution, exposure of sensitive user data in UI and logs, and insecure storage of sensitive information in localStorage/sessionStorage.
+
+Multiple vulnerabilities: SQL injection, command injection, XSS, unsafe deserialization, insecure cookies, hardcoded secrets, weak hashing.
+
+Open CORS policy: The CORS middleware is configured with default settings, allowing all origins. It's recommended to restrict the allowed origins via configuration to prevent unwanted cross-origin requests.
+
+⚡ Recommended areas for review
+
+ Hardcoded Secrets
+Credentials, API keys, encryption keys, and JWT secrets are hardcoded in source. Move all secrets to environment variables or a secret store.
+
+ Sensitive Information
+Database credentials are hard-coded, which can expose sensitive information and hinder configuration flexibility. Consider using environment variables or a secure configuration manager.
+
+ Hardcoded Secrets
+Sensitive API keys, JWT secrets, database URLs, and admin credentials are hardcoded in the source. They should be moved to secure storage or environment variables to avoid leaks.
+
+ Hard-coded Credentials
+DB credentials, API keys, encryption keys, and other secrets are hard-coded in the source code, exposing them in version control and binaries.
+
+ Sensitive data exposure
+User passwords, credit card details, and SSNs are rendered in the UI and stored/logged, exposing sensitive information.
+
+ Sensitive Information
+Hard-coded API keys and JWT secrets are embedded directly in the source, risking exposure if code is shared or decompiled.
+
+ SQL Injection
+Dynamic SQL queries are built with string concatenation using untrusted input without sanitization or parameterization.
+
+ SQL Injection
+Queries are constructed via string interpolation with untrusted inputs, exposing the application to SQL injection. Use parameterized queries or prepared statements instead.
+
+ SQL Injection
+SQL queries are built by interpolating user input directly into strings without sanitization or parameterization, risking SQL injection attacks.
+
+ Cross-site Scripting
+Unescaped user input is injected into HTML and loaded into a WebView, enabling XSS attacks.
+
+@codeant-aiCodeAnt AI
+codeant-ai bot commented 36 minutes ago
+CodeAnt AI finished reviewing your PR.
+
+@avolcoff avolcoff changed the title updated CodeAnt-pr 19 minutes ago
+@avolcoff avolcoff changed the title CodeAnt-pr CodeAnt-pr - current Best 16 minutes ago
+Merge info
+No conflicts with base branch
+Merging can be performed automatically.
+
+You can also merge this with the command line. 
+@avolcoff
+
+
+Add a comment
+Comment
+ 
+Add your comment here...
+ 
+Remember, contributions to this repository should follow our GitHub Community Guidelines.
+ ProTip! Add comments to specific lines under Files changed.
+Reviewers
+No reviews
+Still in progress?
+Assignees
+No one—
+Labels
+size:XXL
+Projects
+None yet
+Milestone
+No milestone
+Development
+Successfully merging this pull request may close these issues.
+
+None yet
+
+
+Notifications
+Customize
+You’re receiving notifications because you authored the thread.
+2 participants
+@avolcoff
+@arivbalcony
+Footer
+© 2025 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+CodeAnt-pr - current Best by avolcoff · Pull Request #19 · avolcoff/ai-code-review-benchmark
+
