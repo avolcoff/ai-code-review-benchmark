@@ -1,0 +1,40 @@
+{
+  "name": "multi-platform-user-management",
+  "version": "1.0.0",
+  "description": "A comprehensive user management system with implementations across multiple platforms and languages",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "jest",
+    "lint": "eslint src/**/*.js",
+    "build": "webpack --mode production"
+  },
+  "keywords": [
+    "user-management",
+    "authentication",
+    "security",
+    "multi-platform"
+  ],
+  "author": "Development Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.2",
+    "eslint": "^8.47.0",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 
